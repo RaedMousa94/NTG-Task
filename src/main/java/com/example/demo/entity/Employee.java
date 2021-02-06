@@ -1,13 +1,14 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.annotation.processing.Generated;
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -61,9 +62,14 @@ public class Employee {
     private String status;
 
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-    @JoinTable(name = "children_relation",
-    joinColumns = {@JoinColumn (name = "mamager_id")},
-    inverseJoinColumns = {@JoinColumn (name = "children_id")})
-    private List<Employee> children;
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH,CascadeType.DETACH,CascadeType.REFRESH})
+    @JoinColumn(name = "manager_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    private Employee manager;
+
+    @OneToMany(mappedBy = "manager",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH,CascadeType.DETACH,CascadeType.REFRESH})
+    private List<Employee> children = new ArrayList<>();
+
 }

@@ -9,8 +9,7 @@ import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee , Integer> {
 
-    @Query(value = "SELECT distinct a.* FROM employee_info as a left join children_relation as b on a.id = b.mamager_id where a.id not in (select c.children_id from children_relation c)",nativeQuery = true)
-    public List<Employee> findMangerId();
+    public List<Employee> findByManagerIdIsNull();
 
     public Optional<Employee> findByUserName(String userName);
 
