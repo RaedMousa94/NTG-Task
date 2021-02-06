@@ -1,18 +1,12 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.EmployeeRepository;
-import com.example.demo.dto.DataEmployeeDto;
-import com.example.demo.dto.EmployeeDto;
-import com.example.demo.dto.SelectManagerDto;
 import com.example.demo.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -46,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteById(int id) {
-        Employee urr = employeeRepository.getOne(childId);
+//        Employee urr = employeeRepository.getOne(childId);
 
         employeeRepository.deleteById(id);
     }

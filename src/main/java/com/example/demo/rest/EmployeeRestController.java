@@ -7,6 +7,7 @@ import com.example.demo.dto.UserDto;
 import com.example.demo.entity.Employee;
 import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -94,12 +95,14 @@ public class EmployeeRestController {
 
     @PostMapping("/employee")
     public void save(@RequestBody UserDto userDto) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         Employee employee = Employee.builder()
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .userName(userDto.getUserName())
                 .locationName(userDto.getLocationName())
-                .password(userDto.getPassword())
+                .password(encoder.encode(userDto.getPassword()))
                 .mobileNum(userDto.getMobileNum())
                 .email(userDto.getEmail())
                 .gender(userDto.getGender())
@@ -126,13 +129,15 @@ public class EmployeeRestController {
 
     @PutMapping("employee/{id}")
     public void save(@PathVariable int id ,@RequestBody UserDto userDto) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         Employee employee = Employee.builder()
                 .id(userDto.getId())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .userName(userDto.getUserName())
                 .locationName(userDto.getLocationName())
-                .password(userDto.getPassword())
+                .password(encoder.encode(userDto.getPassword()))
                 .mobileNum(userDto.getMobileNum())
                 .email(userDto.getEmail())
                 .gender(userDto.getGender())
