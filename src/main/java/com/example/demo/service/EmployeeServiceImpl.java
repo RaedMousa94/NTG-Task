@@ -1,18 +1,12 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.EmployeeRepository;
-import com.example.demo.dto.DataEmployeeDto;
-import com.example.demo.dto.EmployeeDto;
-import com.example.demo.dto.SelectManagerDto;
 import com.example.demo.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -22,7 +16,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> findAll() {
-
         return employeeRepository.findAll();
     }
 
@@ -47,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteById(int id) {
         Employee urr = employeeRepository.getOne(id);
-        urr.getChildren().forEach(c->{
+        urr.getChildren().forEach(c -> {
             c.setManager(null);
             employeeRepository.save(c);
         });
@@ -57,22 +50,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void addChild(int managerId, int childId) {
         Employee manager = employeeRepository.getOne(managerId);
         Employee child = employeeRepository.getOne(childId);
-        manager.getChildren().add(child);
-        employeeRepository.save(manager);
+        child.setManager(manager);
+        employeeRepository.save(child);
     }
 
-    public void removeChild(int managerId, int childId) {
-        Employee manager = employeeRepository.getOne(managerId);
-        manager.getChildren().removeIf(employee -> employee.getId() == childId);
-        employeeRepository.save(manager);
-    }
-
-    public List<Employee> findManager(){
-        List<Employee> managerIds  = employeeRepository.findByManagerIdIsNull();
+    public List<Employee> findManager() {
+        List<Employee> managerIds = employeeRepository.findByManagerIdIsNull();
         return managerIds;
     }
 
-    public List<Employee> findForSelectManagers(){
+    public List<Employee> findForSelectManagers() {
         List<Employee> employees = employeeRepository.findAll();
         return employees;
     }

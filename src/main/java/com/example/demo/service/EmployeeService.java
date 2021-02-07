@@ -11,7 +11,6 @@ public interface EmployeeService {
     public Employee save(Employee employee);
     public void deleteById(int id);
     public void addChild(int managerId, int childId );
-    public void removeChild(int managerId, int childId );
     public List<Employee> findManager();
     public List<Employee> findForSelectManagers();
 

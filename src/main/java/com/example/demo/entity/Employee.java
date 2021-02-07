@@ -2,14 +2,9 @@ package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import javax.annotation.processing.Generated;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -62,14 +57,17 @@ public class Employee {
     private String status;
 
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH,CascadeType.DETACH,CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH,CascadeType.REFRESH})
     @JoinColumn(name = "manager_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
-    private Employee manager;
+    private Employee manager ;
 
-    @OneToMany(mappedBy = "manager",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH,CascadeType.DETACH,CascadeType.REFRESH})
-    private List<Employee> children = new ArrayList<>();
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "manager",fetch =FetchType.LAZY )
+    private Set<Employee> children = new HashSet<>();
 
 }

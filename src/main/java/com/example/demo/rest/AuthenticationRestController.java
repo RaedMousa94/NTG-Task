@@ -1,52 +1,42 @@
 package com.example.demo.rest;
 
-import com.example.demo.exception.AuthenticationException;
 import com.example.demo.dto.JwtTokenRequest;
 import com.example.demo.dto.JwtTokenResponse;
-import com.example.demo.jwt.JwtTokenUtil;
-import com.example.demo.jwt.JwtUserDetails;
+import com.example.demo.exception.AuthenticationException;
+import com.example.demo.security.AuthService;
+import com.example.demo.security.JwtTokenUtil;
+import com.example.demo.security.JwtUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
-public class JwtAuthenticationRestController {
+@CrossOrigin(origins="*", maxAge=3600)
+public class AuthenticationRestController {
 
     @Value("${jwt.http.request.header}")
     private String tokenHeader;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
+    AuthService authService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private UserDetailsService jwtInMemoryUserDetailsService;
+    private UserDetailsService jwtUserDetailsService;
 
     @RequestMapping(value = "${jwt.get.token.uri}", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtTokenRequest authenticationRequest)
-            throws AuthenticationException {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtTokenRequest authenticationRequest) throws AuthenticationException {
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
-        final UserDetails userDetails = jwtInMemoryUserDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
-
+        authService.authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-
         return ResponseEntity.ok(new JwtTokenResponse(token));
     }
 
@@ -55,8 +45,7 @@ public class JwtAuthenticationRestController {
         String authToken = request.getHeader(tokenHeader);
         final String token = authToken.substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(token);
-        JwtUserDetails user = (JwtUserDetails) jwtInMemoryUserDetailsService.loadUserByUsername(username);
-
+        JwtUserDetails user = (JwtUserDetails) jwtUserDetailsService.loadUserByUsername(username);
         if (jwtTokenUtil.canTokenBeRefreshed(token)) {
             String refreshedToken = jwtTokenUtil.refreshToken(token);
             return ResponseEntity.ok(new JwtTokenResponse(refreshedToken));
@@ -70,16 +59,4 @@ public class JwtAuthenticationRestController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
-    private void authenticate(String username, String password) {
-        Objects.requireNonNull(username);
-        Objects.requireNonNull(password);
-
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new AuthenticationException("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new AuthenticationException("INVALID_CREDENTIALS", e);
-        }
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.demo.jwt;
+package com.example.demo.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtUnAuthorizedResponseAuthenticationEntryPoint jwtUnAuthorizedResponseAuthenticationEntryPoint;
 
     @Autowired
-    private UserDetailsService jwtInMemoryUserDetailsService;
+    private UserDetailsService jwtUserDetailsService;
 
     @Autowired
     private JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter;
@@ -37,7 +37,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jwtInMemoryUserDetailsService).passwordEncoder(passwordEncoderBean());
+        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoderBean());
     }
 
     @Bean
